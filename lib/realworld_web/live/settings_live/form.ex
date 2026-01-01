@@ -1,0 +1,46 @@
+defmodule RealworldWeb.SettingsLive.Form do
+  use RealworldWeb, :live_component
+  alias AshPhoenix.Form
+
+  @impl true
+  def update(assigns, socket) do
+    {:ok, assign(socket, assigns)}
+  end
+
+  @impl true
+  def handle_event("validate", %{"user" => params}, socket) do
+    form =
+      socket.assigns.form
+      |> Form.validate(params, errors: false)
+
+    {:noreply, assign(socket, form: form)}
+  end
+
+  @impl true
+  def handle_event("submit", %{"user" => params}, socket) do
+    form =
+      socket.assigns.form
+      |> Form.validate(params)
+
+    socket =
+      socket
+      |> assign(:form, form)
+      |> assign(:errors, Form.errors(form))
+
+    submit_form(form, params, socket)
+  end
+
+  defp submit_form(%{source: %{valid?: true}} = form, params, socket) do
+    case Form.submit(form, params: params) do
+      {:ok, user} ->
+        {:noreply, redirect(socket, to: ~p"/profile/#{user.username}")}
+
+      {:error, form} ->
+        {:noreply, assign(socket, :form, form)}
+    end
+  end
+
+  defp submit_form(_form, _params, socket) do
+    {:noreply, socket}
+  end
+end
