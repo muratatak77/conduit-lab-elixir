@@ -42,7 +42,7 @@ defmodule Realworld.Articles.ArticleTest do
 
       # `SlugifyTitle` derives the slug from the title.
       assert published_article.title == title
-      assert published_article.slug == Slug.slugify(title)
+      assert published_article.slug == Slug.slugify(title, separator: "_")
     end
 
     test "renders body_raw markdown into sanitized HTML" do
@@ -138,7 +138,7 @@ defmodule Realworld.Articles.ArticleTest do
         )
         |> Ash.update()
 
-      assert updated.slug == Slug.slugify(new_title)
+      assert updated.slug == Slug.slugify(new_title, separator: "_")
       assert updated.body =~ "<h2>"
     end
 
